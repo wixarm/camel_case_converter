@@ -54,8 +54,13 @@
 
             // Add click event listener to copy path to clipboard
             keyElement.onclick = () => {
-                navigator.clipboard.writeText("item?." + fullPath)
+                navigator.clipboard.writeText("item?." + fullPath + ",")
             };
+
+            keyElement.ondblclick = () => {
+                navigator.clipboard.writeText("item?." + fullPath + "?.toLocaleString()" + ",")
+            };
+
 
             // Append the key element to the output
             outputElement.appendChild(keyElement);
