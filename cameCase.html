@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert Keys to Camel Case</title>
+</head>
+<script>
+    // Function to convert snake_case to camelCase
+    function toCamelCase(snakeCase) {
+        return snakeCase.replace(/(_\w)/g, (m) => m[1].toUpperCase());
+    }
+
+    // Function to convert object keys to camelCase
+    function convertKeys(obj) {
+        return Object.keys(obj).reduce((acc, key) => {
+            const camelCaseKey = toCamelCase(key);
+            const value = obj[key];
+
+            // If the value is an object, convert its keys recursively
+            acc[camelCaseKey] = (typeof value === 'object' && value !== null) ? convertKeys(value) : value;
+            return acc;
+        }, {});
+    }
+
+    // Function to execute conversion and display result
+    function convertObjectKeys() {
+        const inputText = document.getElementById("inputArea").value;
+
+        try {
+            const inputObject = JSON.parse(inputText); // Parse the input text as JSON
+            const convertedObject = convertKeys(inputObject);
+            displayConvertedOutput(convertedObject);
+        } catch (error) {
+            document.getElementById("output").textContent = "Invalid JSON: " + error.message;
+        }
+    }
+
+    // Recursive function to display keys and handle nesting
+    function displayConvertedOutput(obj, parentPath = '') {
+        const outputElement = document.getElementById("output");
+        outputElement.innerHTML = ''; // Clear previous output
+
+        for (const key in obj) {
+            const camelCaseKey = key;
+            // Add '?' before each dot in the full path
+            const fullPath = parentPath ? `${parentPath}?.${camelCaseKey}` : camelCaseKey;
+
+            // Create a clickable key element
+            const keyElement = document.createElement("div");
+            keyElement.className = "key";
+            keyElement.textContent = fullPath;
+
+            // Add click event listener to copy path to clipboard
+            keyElement.onclick = () => {
+                navigator.clipboard.writeText("item?." + fullPath)
+            };
+
+            // Append the key element to the output
+            outputElement.appendChild(keyElement);
+
+            // If the value is an object, recursively display its keys
+            if (typeof obj[key] === 'object' && obj[key] !== null) {
+                displayConvertedOutput(obj[key], fullPath); // Recursive call to display nested keys
+            }
+        }
+    }
+
+</script>
+
+<style>
+    textarea {
+        width: 100%;
+        height: 200px;
+        margin-bottom: 10px;
+    }
+
+    pre {
+        background: #f0f0f0;
+        padding: 10px;
+        border-radius: 5px;
+        overflow: auto;
+        cursor: pointer;
+        /* Change cursor to pointer for clickability */
+    }
+
+    .key {
+        color: blue;
+        /* Optional: change color of keys */
+        cursor: pointer;
+        /* Indicate that keys are clickable */
+    }
+</style>
+
+<body>
+    <h1>Convert Object Keys</h1>
+    <textarea id="inputArea" placeholder='Enter your JSON object here...'></textarea>
+    <button onclick="convertObjectKeys()">Convert</button>
+    <h2>Converted Output:</h2>
+    <pre id="output"></pre>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
+
+</html>
